@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EZ SOS Settings</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 12px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      color: #222;
+      background: #f2f2f2;
+    }
+    h1 { margin: 0 0 12px; font-size: 20px; }
+    h2 {
+      margin: 18px 0 8px;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #555;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 8px;
+    }
+    label {
+      display: block;
+      margin: 6px 0 2px;
+      font-size: 13px;
+      color: #444;
+    }
+    input[type="text"],
+    input[type="tel"],
+    textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font: inherit;
+    }
+    textarea { min-height: 64px; resize: vertical; }
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .row label.inline {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin: 0;
+      flex: 1;
+    }
+    button {
+      font: inherit;
+      padding: 8px 12px;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+      background: #eee;
+      cursor: pointer;
+    }
+    button.primary,
+    a.primary {
+      background: #1a6fb5;
+      border-color: #155a94;
+      color: #fff;
+      width: 100%;
+      margin-top: 16px;
+      padding: 12px;
+      font-weight: 600;
+    }
+    a.primary,
+    a.add {
+      display: block;
+      box-sizing: border-box;
+      text-align: center;
+      text-decoration: none;
+      border-radius: 4px;
+      border: 1px solid #bbb;
+      font: inherit;
+    }
+    a.add {
+      background: #eee;
+      color: #222;
+      width: 100%;
+      margin-top: 8px;
+      padding: 10px 12px;
+    }
+    button.danger {
+      background: #fff;
+      border-color: #c44;
+      color: #c44;
+    }
+    button.add { width: 100%; margin-top: 4px; }
+    .hint { font-size: 13px; color: #555; margin-top: 10px; line-height: 1.4; }
+    .modes label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0;
+    }
+    .contact-name { font-weight: 600; margin-bottom: 4px; }
+    .empty { color: #777; font-size: 13px; padding: 8px 0; }
+    .note { line-height: 1.45; }
+    #androidPanel, #editorPanel { display: none; }
+  </style>
+</head>
+<body>
+  <div id="androidPanel" class="card note">
+    <h1>EZ SOS</h1>
+    <p id="androidMessage"></p>
+    <div id="androidActions"></div>
+    <p class="hint" id="androidHint"></p>
+    <button type="button" class="add" id="androidDone" style="margin-top:12px">Close</button>
+  </div>
+
+  <div id="editorPanel">
+    <h1>EZ SOS</h1>
+    <p class="empty"><strong>Android companion required.</strong> On phones, use the EZ SOS companion — this emulator page is only a fallback for testing.</p>
+
+    <h2>Trigger mode</h2>
+    <div class="card modes" id="modes">
+      <label><input type="radio" name="triggerMode" value="single"> Single press</label>
+      <label><input type="radio" name="triggerMode" value="confirm"> Confirm (recommended)</label>
+      <label><input type="radio" name="triggerMode" value="hold"> Hold Select</label>
+    </div>
+
+    <h2>Hold duration</h2>
+    <div class="card modes" id="holdMs">
+      <label><input type="radio" name="holdMs" value="1000"> 1 second</label>
+      <label><input type="radio" name="holdMs" value="1500"> 1.5 seconds</label>
+      <label><input type="radio" name="holdMs" value="2000"> 2 seconds</label>
+      <label><input type="radio" name="holdMs" value="3000"> 3 seconds</label>
+    </div>
+
+    <h2>Watch alarm</h2>
+    <div class="card">
+      <label class="inline"><input type="checkbox" id="watchAlarmSound" checked> Watch alarm sound</label>
+      <label class="inline" style="margin-top:8px"><input type="checkbox" id="selfLocateAlarm" checked> Alarm my phone &amp; watch when I SOS</label>
+    </div>
+
+    <h2>Message prefix</h2>
+    <div class="card">
+      <textarea id="messagePrefix" placeholder="EZ SOS: I need help."></textarea>
+    </div>
+
+    <h2>Contacts</h2>
+    <div id="contacts"></div>
+    <button type="button" class="add" id="addContact">Add contact</button>
+    <button type="button" class="primary" id="save">Save</button>
+  </div>
+
+  <script>
+(function () {
+  var DEFAULT_PREFIX = 'EZ SOS: I need help.';
+  var DEFAULT_MODE = 'confirm';
+  var DEFAULT_HOLD_MS = 1500;
+  var HOLD_MS_PRESETS = [1000, 1500, 2000, 3000];
+
+  function uid() {
+    return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  function normalizeHoldMs(raw) {
+    var value = typeof raw === 'number' ? raw : parseInt(raw, 10);
+    if (!value || isNaN(value)) return DEFAULT_HOLD_MS;
+    if (HOLD_MS_PRESETS.indexOf(value) !== -1) return value;
+    var best = DEFAULT_HOLD_MS;
+    var bestDist = Math.abs(value - best);
+    for (var i = 0; i < HOLD_MS_PRESETS.length; i++) {
+      var dist = Math.abs(value - HOLD_MS_PRESETS[i]);
+      if (dist < bestDist) {
+        best = HOLD_MS_PRESETS[i];
+        bestDist = dist;
+      }
+    }
+    return best;
+  }
+
+  function detectPhoneOs() {
+    var ua = navigator.userAgent || '';
+    if (/Android/i.test(ua)) return 'android';
+    if (/iPhone|iPad|iPod/i.test(ua)) return 'ios';
+    return 'other';
+  }
+
+  function parseHash() {
+    try {
+      var raw = window.location.hash ? window.location.hash.substring(1) : '';
+      if (!raw) return {};
+      return JSON.parse(decodeURIComponent(raw));
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function getQueryParam(name) {
+    var search = window.location.search || '';
+    if (!search && window.location.href.indexOf('?') !== -1) {
+      search = '?' + window.location.href.split('?')[1].split('#')[0];
+    }
+    var q = search.charAt(0) === '?' ? search.substring(1) : search;
+    var parts = q.split('&');
+    for (var i = 0; i < parts.length; i++) {
+      var kv = parts[i].split('=');
+      if (decodeURIComponent(kv[0]) === name) {
+        return decodeURIComponent(kv.slice(1).join('=') || '');
+      }
+    }
+    return null;
+  }
+
+  function closeWith(obj) {
+    var payload = encodeURIComponent(JSON.stringify(obj));
+    var returnTo = getQueryParam('return_to');
+    if (returnTo) {
+      document.location = returnTo + payload;
+    } else {
+      document.location = 'pebblejs://close#' + payload;
+    }
+  }
+
+  function normalizeSettings(raw) {
+    var s = raw && typeof raw === 'object' ? raw : {};
+    var mode = s.triggerMode;
+    if (mode !== 'single' && mode !== 'confirm' && mode !== 'hold') {
+      mode = DEFAULT_MODE;
+    }
+    var contacts = Array.isArray(s.contacts) ? s.contacts : [];
+    return {
+      triggerMode: mode,
+      holdMs: normalizeHoldMs(s.holdMs),
+      messagePrefix: typeof s.messagePrefix === 'string' && s.messagePrefix.length
+        ? s.messagePrefix
+        : DEFAULT_PREFIX,
+      contacts: contacts.map(function (c, i) {
+        return {
+          id: c && c.id ? String(c.id) : uid() + i,
+          name: c && c.name ? String(c.name) : '',
+          phone: c && c.phone ? String(c.phone) : '',
+          enabled: !c || c.enabled !== false
+        };
+      }),
+      watchAlarmSound: s.watchAlarmSound !== false,
+      selfLocateAlarm: s.selfLocateAlarm !== false
+    };
+  }
+
+  var hash = parseHash();
+  var phoneOs = detectPhoneOs();
+  var companionPresent = !!hash.companionPresent;
+  var appVersion = typeof hash.appVersion === 'string' ? hash.appVersion.replace(/^v/, '') : '';
+  var settingsRaw = hash.settings || (hash.triggerMode || hash.contacts ? hash : null);
+  var state = normalizeSettings(settingsRaw);
+
+  var RELEASES_LATEST = 'https://github.com/caellach/pebble-ez-sos/releases/latest';
+  var releasePageUrl = appVersion
+    ? ('https://github.com/caellach/pebble-ez-sos/releases/tag/v' + appVersion)
+    : RELEASES_LATEST;
+  var apkUrl = appVersion
+    ? ('https://github.com/caellach/pebble-ez-sos/releases/download/v' + appVersion +
+       '/EZ_SOS-companion-' + appVersion + '.apk')
+    : RELEASES_LATEST;
+  /* Prefer Android intent:// so the Pebble webview can launch the companion reliably. */
+  var settingsIntentUrl =
+    'intent://settings#Intent;scheme=ezsos;package=com.ezsos.companion;' +
+    'category=android.intent.category.BROWSABLE;end';
+
+  if (phoneOs === 'android') {
+    document.getElementById('androidPanel').style.display = 'block';
+    var msg = document.getElementById('androidMessage');
+    var actions = document.getElementById('androidActions');
+    var hint = document.getElementById('androidHint');
+    var verLabel = appVersion ? ('v' + appVersion) : 'latest';
+
+    if (companionPresent) {
+      msg.innerHTML =
+        '<strong>The Android companion app is required</strong> — EZ SOS will not send or receive SOS without it. ' +
+        'Configure contacts, message, trigger mode, and alerts in the companion — not on this page.';
+      actions.innerHTML =
+        '<a class="primary" href="' + settingsIntentUrl + '">Open companion settings</a>' +
+        '<a class="add" href="ezsos://settings">Open settings (alternate link)</a>' +
+        '<a class="add" href="' + releasePageUrl + '">Companion release (' + verLabel + ')</a>' +
+        (appVersion
+          ? '<a class="add" href="' + RELEASES_LATEST + '">Latest release on GitHub</a>'
+          : '');
+      hint.textContent =
+        'If Open companion settings does nothing, install or update the companion from the release link, then try again.';
+    } else {
+      msg.innerHTML =
+        '<strong>The Android companion app is required</strong> — without it this watchapp cannot send silent SOS SMS or raise inbound alarms. ' +
+        'Install the companion below, then open it and grant permissions.';
+      actions.innerHTML =
+        '<a class="primary" href="' + apkUrl + '">Download companion APK (' + verLabel + ')</a>' +
+        '<a class="add" href="' + releasePageUrl + '">Open release page (' + verLabel + ')</a>' +
+        (appVersion
+          ? '<a class="add" href="' + RELEASES_LATEST + '">Latest release on GitHub</a>'
+          : '') +
+        '<a class="add" href="' + settingsIntentUrl + '">Already installed? Open settings</a>';
+      hint.textContent =
+        'APK matches this watchapp version when that GitHub release exists; otherwise use Latest.';
+    }
+    document.getElementById('androidDone').onclick = function () {
+      closeWith({ phoneOs: phoneOs });
+    };
+    return;
+  }
+
+  document.getElementById('editorPanel').style.display = 'block';
+
+  function setMode(mode) {
+    var radios = document.querySelectorAll('input[name="triggerMode"]');
+    for (var i = 0; i < radios.length; i++) {
+      radios[i].checked = radios[i].value === mode;
+    }
+  }
+
+  function setHoldMs(ms) {
+    var value = String(normalizeHoldMs(ms));
+    var radios = document.querySelectorAll('input[name="holdMs"]');
+    for (var i = 0; i < radios.length; i++) {
+      radios[i].checked = radios[i].value === value;
+    }
+  }
+
+  function readFormContact(card) {
+    return {
+      id: card.getAttribute('data-id'),
+      name: card.querySelector('.name').value.trim(),
+      phone: card.querySelector('.phone').value.trim(),
+      enabled: card.querySelector('.enabled').checked
+    };
+  }
+
+  function renderContacts() {
+    var root = document.getElementById('contacts');
+    root.innerHTML = '';
+    if (!state.contacts.length) {
+      var empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = 'No contacts yet. Add at least one enabled contact for SOS.';
+      root.appendChild(empty);
+      return;
+    }
+    state.contacts.forEach(function (c, index) {
+      var card = document.createElement('div');
+      card.className = 'card';
+      card.setAttribute('data-id', c.id);
+      card.innerHTML =
+        '<div class="contact-name">Contact ' + (index + 1) + '</div>' +
+        '<label>Name</label>' +
+        '<input class="name" type="text" value="">' +
+        '<label>Phone</label>' +
+        '<input class="phone" type="tel" value="" placeholder="+15551234567">' +
+        '<div class="row">' +
+          '<label class="inline"><input class="enabled" type="checkbox"> Enabled</label>' +
+          '<button type="button" class="danger remove">Remove</button>' +
+        '</div>';
+      card.querySelector('.name').value = c.name;
+      card.querySelector('.phone').value = c.phone;
+      card.querySelector('.enabled').checked = !!c.enabled;
+      card.querySelector('.remove').addEventListener('click', function () {
+        state.contacts = collectContacts().filter(function (x) { return x.id !== c.id; });
+        renderContacts();
+      });
+      root.appendChild(card);
+    });
+  }
+
+  function collectContacts() {
+    var cards = document.querySelectorAll('#contacts .card');
+    var list = [];
+    for (var i = 0; i < cards.length; i++) {
+      list.push(readFormContact(cards[i]));
+    }
+    return list;
+  }
+
+  function collectSettings() {
+    var modeEl = document.querySelector('input[name="triggerMode"]:checked');
+    var holdEl = document.querySelector('input[name="holdMs"]:checked');
+    return {
+      triggerMode: modeEl ? modeEl.value : DEFAULT_MODE,
+      holdMs: normalizeHoldMs(holdEl ? holdEl.value : DEFAULT_HOLD_MS),
+      messagePrefix: document.getElementById('messagePrefix').value || DEFAULT_PREFIX,
+      contacts: collectContacts(),
+      watchAlarmSound: document.getElementById('watchAlarmSound').checked,
+      selfLocateAlarm: document.getElementById('selfLocateAlarm').checked
+    };
+  }
+
+  document.getElementById('addContact').addEventListener('click', function () {
+    state.contacts = collectContacts();
+    state.contacts.push({ id: uid(), name: '', phone: '', enabled: true });
+    renderContacts();
+  });
+
+  document.getElementById('save').addEventListener('click', function () {
+    closeWith({ phoneOs: phoneOs, settings: collectSettings() });
+  });
+
+  setMode(state.triggerMode);
+  setHoldMs(state.holdMs);
+  document.getElementById('watchAlarmSound').checked = state.watchAlarmSound !== false;
+  document.getElementById('selfLocateAlarm').checked = state.selfLocateAlarm !== false;
+  document.getElementById('messagePrefix').value = state.messagePrefix;
+  renderContacts();
+})();
+  </script>
+</body>
+</html>

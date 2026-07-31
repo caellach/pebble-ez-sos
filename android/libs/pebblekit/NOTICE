@@ -1,0 +1,5 @@
+Vendored classic PebbleKit Android sources from:
+https://github.com/pebble/pebble-android-sdk
+
+Original package: com.getpebble.android.kit
+Patched only for Android 13+ Context.registerReceiver exported-flag compatibility.

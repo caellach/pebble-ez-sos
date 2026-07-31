@@ -1,0 +1,17 @@
+/.gradle/
+/build/
+/local.properties
+/.idea/
+*.iml
+/captures/
+/.cxx/
+app/build/
+libs/pebblekit/build/
+*.apk
+*.ap_
+*.dex
+/.android-sdk/
+/*.keystore
+/*.jks
+/keystore/
+/.signing/

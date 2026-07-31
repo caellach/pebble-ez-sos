@@ -1,0 +1,56 @@
+{
+  "name": "EZ_SOS",
+  "author": "EZ SOS",
+  "version": "1.0.0",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "EZ SOS",
+    "uuid": "cf79bb9f-ab43-4848-81b6-d1c1ae6a9226",
+    "sdkVersion": "3",
+    "enableMultiJS": true,
+    "targetPlatforms": [
+      "aplite",
+      "basalt",
+      "chalk",
+      "diorite",
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": false,
+      "configurable": true
+    },
+    "capabilities": [
+      "configurable",
+      "location"
+    ],
+    "messageKeys": {
+      "SOS_REQUEST": 1,
+      "STATUS": 2,
+      "TRIGGER_MODE": 3,
+      "SETTINGS_JSON": 4,
+      "SETTINGS_REQUEST": 5,
+      "INBOUND_ALERT": 6,
+      "SETTINGS_CHUNK_INDEX": 7,
+      "SETTINGS_CHUNK_DATA": 8,
+      "SETTINGS_CHUNK_COUNT": 9,
+      "COMPANION_PRESENT": 10,
+      "HOLD_MS": 11,
+      "WATCH_ALARM_SOUND": 12,
+      "SELF_LOCATE_ALERT": 13
+    },
+    "resources": {
+      "media": [
+        {
+          "type": "bitmap",
+          "name": "MENU_ICON",
+          "file": "images/menu_icon.png",
+          "menuIcon": true
+        }
+      ]
+    }
+  }
+}

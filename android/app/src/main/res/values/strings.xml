@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EZ SOS</string>
+    <string name="main_subtitle">Mutual SOS coverage — you and your safety contacts each run this companion. Watch triggers SOS; an inbound SOS from a contact alarms this phone and your watch.</string>
+    <string name="main_status">Pebble phone app: %1$s\nSMS permission: %2$s\nLocation permission: %3$s\nWatch UUID:\n%4$s</string>
+    <string name="yes">yes</string>
+    <string name="no">no</string>
+    <string name="pebble_app_missing">not installed</string>
+    <string name="pebble_app_core">installed (Core)</string>
+    <string name="pebble_app_basalt">installed (classic)</string>
+    <string name="pebble_app_other">installed</string>
+    <string name="settings_none">No contacts yet — tap Edit contacts &amp; settings.</string>
+    <string name="settings_summary">%1$d enabled / %2$d contacts · trigger %3$s · phone %4$s</string>
+    <string name="btn_edit_settings">Edit contacts &amp; settings</string>
+    <string name="btn_sync_settings">Pull settings from watch (recovery)</string>
+    <string name="btn_permissions">Grant SMS, phone, contacts &amp; location</string>
+    <string name="btn_test_watch_alarm">Test watch alarm</string>
+    <string name="btn_test_phone_alarm">Test phone alarm</string>
+    <string name="btn_test_self_locate">Test self-locate alarm</string>
+    <string name="toast_test_watch">Sent SOS alert to watch</string>
+    <string name="toast_test_self_locate">Triggered self-locate on phone &amp; watch</string>
+    <string name="toast_phone_alarm_off">Phone alert is Off — change it in settings</string>
+    <string name="toast_permissions_ok">All permissions already granted</string>
+    <string name="event_log_title">Event log</string>
+    <string name="btn_clear_log">Clear</string>
+
+    <string name="label_phone_alert">Phone alert when a contact sends SOS</string>
+    <string name="phone_alert_off">Off (watch only)</string>
+    <string name="phone_alert_notification">Notification</string>
+    <string name="phone_alert_fullscreen">Full-screen alarm</string>
+
+    <string name="label_auth_window">Accept SOS tokens within</string>
+    <string name="auth_window_hint">Receiving only. Tighter reduces replay risk; looser tolerates clock skew and SMS delay.</string>
+    <string name="auth_window_5m">5 minutes</string>
+    <string name="auth_window_15m">15 minutes</string>
+    <string name="auth_window_30m">30 minutes</string>
+    <string name="auth_window_60m">60 minutes</string>
+
+    <string name="alarm_fullscreen_title">Incoming SOS</string>
+    <string name="alarm_fullscreen_body">From %1$s — needs urgent attention</string>
+    <string name="alarm_contact_unknown">a safety contact</string>
+    <string name="alarm_test_contact">Test</string>
+    <string name="btn_dismiss_alarm">Dismiss</string>
+
+    <string name="settings_title">Safety contacts</string>
+    <string name="settings_subtitle">Contacts here are people who also use EZ SOS. You can SOS them from the watch; if they SOS you, this phone and your watch can alarm. Prefix, trigger mode, and phone alert style sync to the watch.</string>
+    <string name="label_trigger_mode">Trigger mode</string>
+    <string name="mode_single">Single press</string>
+    <string name="mode_confirm">Confirm (recommended)</string>
+    <string name="mode_hold">Hold Select</string>
+    <string name="label_hold_duration">Hold duration</string>
+    <string name="hold_1s">1 second</string>
+    <string name="hold_15s">1.5 seconds</string>
+    <string name="hold_2s">2 seconds</string>
+    <string name="hold_3s">3 seconds</string>
+    <string name="label_watch_alarm_sound">Watch alarm sound</string>
+    <string name="watch_alarm_sound_hint">On watches with a speaker, play a repeating tone during Incoming SOS and self-locate (vibe always stays on).</string>
+    <string name="label_self_locate_alarm">Alarm my phone &amp; watch when I SOS (helps others find me)</string>
+    <string name="self_locate_alarm_hint">After you send SOS, your devices alarm even if SMS fails (Check phone). Turn off if a loud self-alarm would be unsafe.</string>
+    <string name="label_message_prefix">SOS message</string>
+    <string name="message_prefix_fixed">EZ SOS:\u0020</string>
+    <string name="message_prefix_hint">Every SOS SMS starts with “EZ SOS:” so peers can recognize it.</string>
+    <string name="message_prefix_body_hint">I need help.</string>
+    <string name="btn_reset_message_prefix">Reset to default</string>
+    <string name="label_contacts">Contacts</string>
+    <string name="hint_contact_name">Name</string>
+    <string name="hint_contact_phone">Phone number</string>
+    <string name="label_enabled">Enabled for SOS</string>
+    <string name="btn_add_contact">Add blank contact</string>
+    <string name="btn_pick_contact">Pick from phone contacts</string>
+    <string name="btn_remove">Remove</string>
+    <string name="btn_save_settings">Save &amp; sync to watch</string>
+    <string name="settings_saved">Saved and synced to watch</string>
+    <string name="contacts_permission_denied">Contacts permission needed to pick a phone number</string>
+    <string name="contacts_no_phone">That contact has no phone number</string>
+    <string name="contacts_choose_number">Choose a number for %1$s</string>
+    <string name="contacts_already_added">That number is already in your list</string>
+    <string name="contacts_pick_title">Pick a contact</string>
+    <string name="contacts_none_found">No contacts with phone numbers found</string>
+
+    <string name="first_run_title">Welcome to EZ SOS</string>
+    <string name="first_run_body">EZ SOS is mutual SOS coverage for people who all install this companion.\n\nIt needs SMS, phone, contacts, and location so it can:\n\n• Let you choose safety contacts who also use EZ SOS\n• Silently text them with GPS when you trigger SOS on the watch\n• Alarm this phone and your watch when a contact sends an SOS to you (not a quiet SMS ding)\n\nGrant SEND_SMS, RECEIVE_SMS, READ_SMS, READ_PHONE_STATE, READ_CONTACTS, and location when prompted. Phone state is required on many dual-SIM devices or SMS send fails.\n\nOn some devices you may also need to disable battery restrictions so inbound SMS is delivered in the background.\n\niOS cannot support this companion. Apple does not allow third-party apps to read SMS content or reliably send silent SMS.</string>
+    <string name="first_run_continue">Grant permissions</string>
+    <string name="first_run_skip">Continue without granting</string>
+
+    <string name="notification_channel_name">Incoming SOS alerts</string>
+    <string name="notification_channel_desc">Urgent alerts when a safety contact sends an SOS</string>
+    <string name="inbound_notification_title">EZ SOS — incoming SOS</string>
+    <string name="inbound_notification_body">SOS from %1$s — needs urgent attention</string>
+    <string name="self_locate_notification_title">EZ SOS — SOS active</string>
+    <string name="self_locate_notification_body">Your SOS is active — alarm helps others find you</string>
+    <string name="self_locate_fullscreen_title">SOS active</string>
+    <string name="self_locate_fullscreen_body">Your SOS is active — this alarm helps others find you</string>
+</resources>

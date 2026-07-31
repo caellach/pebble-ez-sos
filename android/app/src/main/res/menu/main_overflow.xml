@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_event_log"
+        android:title="@string/event_log_title" />
+    <item
+        android:id="@+id/menu_permissions"
+        android:title="@string/btn_permissions" />
+</menu>
